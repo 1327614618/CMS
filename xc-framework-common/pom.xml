@@ -37,7 +37,11 @@
             <artifactId>spring-cloud-starter-feign</artifactId>
             <version>1.4.5.RELEASE</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.xpand</groupId>
+            <artifactId>starter-canal</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

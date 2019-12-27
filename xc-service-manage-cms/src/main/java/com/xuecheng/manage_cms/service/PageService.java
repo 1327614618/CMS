@@ -4,7 +4,9 @@ import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.CmsSite;
 import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,11 +111,17 @@ public class PageService {
 
     public CmsPageResult addPageList(CmsPage cmsPage) {
         //校验cmsPage是否为空
-
+          if (cmsPage==null){
+              return new CmsPageResult(CmsCode.CMS_COURSE_PERVIEWISNULL,cmsPage);
+          }
 
         //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
         CmsPage cmsPageList = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(
                 cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+          if (cmsPageList!=null){
+              //页面已存在
+              ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
+          }
 
         //若不存在
         if (cmsPageList == null) {

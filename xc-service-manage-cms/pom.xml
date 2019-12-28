@@ -56,6 +56,12 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
     </dependency>
+    <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>7.0.0-beta1</version>
+        <scope>compile</scope>
+    </dependency>
 
 </dependencies>
 </project>

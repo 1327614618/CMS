@@ -20,9 +20,12 @@ public class CmsPagePreviewController extends BaseController {
     //接收到页面id
     @RequestMapping(value = "/cms/preview/{pageId}", method = RequestMethod.GET)
     public void preview (@PathVariable("pageId") String pageId){
+        //执行页面静态化
         String pageHtml = pageService.PageHtml(pageId);
         if(StringUtils.isNotEmpty(pageHtml)){
             try {
+                //输出内容
+                //5e06bdc5d43fa82ebc360182
                 ServletOutputStream outputStream = response.getOutputStream();
                 outputStream.write(pageHtml.getBytes("utf-8"));
             } catch (IOException e) {

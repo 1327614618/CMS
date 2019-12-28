@@ -41,7 +41,9 @@ public class FreeMakerText02 {
     PageService pageService;
     @Test
     public void testGridFs() {
-        pageService.PageHtml("5e06bdc5d43fa82ebc360182");
+        String s = pageService.PageHtml("5e06bdc5d43fa82ebc360182");
+        System.out.println(s);
         //5e06b775d43fa819ecd7b425
+        //5a751fab6abb5044e0d19ea1
     }
 }

@@ -35,59 +35,57 @@ public class FreeMakerText {
 
     @Autowired
     RestTemplate restTemplate;
-
-    @Test
-    public void testGridFs() throws FileNotFoundException {
-        //要存储的文件
-        File file = new File("D:/index_banner.html");
-        //定义输入流
-        FileInputStream inputStram = null ;
-
-        try {
-            inputStram = new FileInputStream(file);
-        //向GridFS存储文件
-            ObjectId objectId = gridFsTemplate.store(inputStram, "轮播图测试文件01", "");
-        //得到文件ID
-            String fileId = objectId.toString();
-            System.out.println(file);
-            System.out.println(fileId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Test
-    public void queryFile() throws IOException {
-        String fileId = "5e06b775d43fa819ecd7b425";
-        //根据id查询文件
-        GridFSFile gridFSFile = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(fileId)));
-        //打开下载流对象
-        GridFSDownloadStream gridFSDownloadStream;
-        try {
-        gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId());
-        //创建gridFsResource，用于获取流对象
-            GridFsResource gridFsResource = new GridFsResource(gridFSFile, gridFSDownloadStream);
-        //获取流中的数据
-            String s = IOUtils.toString(gridFsResource.getInputStream(), "utf-8");
-            System.out.println(s);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    
+//
+//    @Test
+//    public void queryFile() throws IOException {
+//        String fileId = "5e06b775d43fa819ecd7b425";
+//        //根据id查询文件
+//        GridFSFile gridFSFile = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(fileId)));
+//        //打开下载流对象
+//        GridFSDownloadStream gridFSDownloadStream;
+//        try {
+//        gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId());
+//        //创建gridFsResource，用于获取流对象
+//            GridFsResource gridFsResource = new GridFsResource(gridFSFile, gridFSDownloadStream);
+//        //获取流中的数据
+//            String s = IOUtils.toString(gridFsResource.getInputStream(), "utf-8");
+//            System.out.println(s);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Test
     public void testRestTemplate() {
         ResponseEntity<Map> forEntity = restTemplate.getForEntity("http://localhost:31001/cms/config/getmodel/5a791725dd573c3574ee333f", Map.class);
         System.out.println(forEntity);
     }
+    
+    //存文件
+    @Test
+    public void testStore() throws FileNotFoundException {
+        //定义file
+        File file =new File("d:/index_banner.ftl");
+        //定义fileInputStream
+        FileInputStream fileInputStream = new FileInputStream(file);
+        ObjectId objectId = gridFsTemplate.store(fileInputStream, "index_banner.ftl");
+        System.out.println(objectId);
+    }
 
-    @RequestMapping("/banner")
-    public String index_banner(Map<String, Object> map) {
-        String dataUrl = "http://localhost:31001/cms/config/getmodel/5a791725dd573c3574ee333f";
-        ResponseEntity<Map> forEntity = restTemplate.getForEntity(dataUrl, Map.class);
-        Map body = forEntity.getBody();
-        map.putAll(body);
-        return "index_banner";
+    //取文件
+    @Test
+    public void queryFile() throws IOException {
+        //根据文件id查询文件
+        GridFSFile gridFSFile = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is("5e07101cd43fa802a8d437d9")));
+
+        //打开一个下载流对象
+        GridFSDownloadStream gridFSDownloadStream = gridFSBucket.openDownloadStream(gridFSFile.getObjectId());
+        //创建GridFsResource对象，获取流
+        GridFsResource gridFsResource = new GridFsResource(gridFSFile,gridFSDownloadStream);
+        //从流中取数据
+        String content = IOUtils.toString(gridFsResource.getInputStream(), "utf-8");
+        System.out.println(content);
+
     }
 }

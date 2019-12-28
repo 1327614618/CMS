@@ -12,8 +12,8 @@
 <div class="banner-roll">
     <div class="banner-item">
         <#if model??>
-            <#list model.model as model>
-                <div class="item" style="background-image: url(${model.value});"></div>
+            <#list model as item>
+                <div class="item" style="background-image: url(${item.value});"></div>
             </#list>
         </#if>
 	<#-- <div class="item" style="background-image: url(../img/widget-bannerA.jpg);"></div>

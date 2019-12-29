@@ -353,6 +353,7 @@ public class PageService {
         //通过DateUrl和Map.class获取到实体模板
         ResponseEntity<Map> forEntity = restTemplate.getForEntity(dataUrl, Map.class);
         //获取内容
+
         Map body = forEntity.getBody();
         return body;
 

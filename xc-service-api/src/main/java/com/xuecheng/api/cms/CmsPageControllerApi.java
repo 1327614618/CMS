@@ -39,6 +39,7 @@ public interface CmsPageControllerApi {
     @ApiOperation("更新修改页面")
     public CmsPageResult edit(String id, CmsPage cmsPage);
 
-
+    @ApiOperation("发布页面")
+    public ResponseResult post(String pageId);
 
 }

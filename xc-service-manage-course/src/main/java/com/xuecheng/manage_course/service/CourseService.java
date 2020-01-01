@@ -1,12 +1,18 @@
 package com.xuecheng.manage_course.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
+import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
+import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.dao.CourseBaseRepository;
+import com.xuecheng.manage_course.dao.CourseMapper;
 import com.xuecheng.manage_course.dao.TeachPlanRepository;
 import com.xuecheng.manage_course.dao.TeachplanMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +30,9 @@ public class CourseService {
     @Autowired
     private TeachPlanRepository teachPlanRepository;
     @Autowired
-   private CourseBaseRepository courseBaseRepository;
+    private CourseBaseRepository courseBaseRepository;
+    @Autowired
+    private CourseMapper courseMapper;
 
     public TeachplanNode findTeachPlanList(String courseId) {
         TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
@@ -58,13 +66,13 @@ public class CourseService {
         //父结点级别
         String parentGrade = teachplanParent.getGrade();
         //设置父结点
-           teachplan.setParentid(parentid);
-           //设置是否发布
-           teachplan.setStatus("0");
+        teachplan.setParentid(parentid);
+        //设置是否发布
+        teachplan.setStatus("0");
         //子结点的级别，根据父结点来判断
-        if(parentGrade.equals("1")){
+        if (parentGrade.equals("1")) {
             teachplan.setGrade("2");
-        }else if(parentGrade.equals("2")) {
+        } else if (parentGrade.equals("2")) {
             teachplan.setGrade("3");
         }
         //设置课程id
@@ -102,4 +110,17 @@ public class CourseService {
 
     }
 
+    public QueryResult<CourseInfo> findCourseBase() {
+        //设置教育机构
+        CourseListRequest courseListRequest = new CourseListRequest();
+        courseListRequest.setCompanyId("1");
+
+        PageHelper.startPage(1, 10);//查询第一页，每页显示10条记录
+        Page<CourseInfo> courseListPage = courseMapper.findCourseListPage(courseListRequest);
+
+
+        QueryResult<CourseInfo> result = new QueryResult<>();
+        result.setList(courseListPage);
+        return result;
+    }
 }

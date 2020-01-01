@@ -2,11 +2,16 @@ package com.xuecheng.manage_course.controller;
 
 import com.xuecheng.api.course.CourseControllerApi;
 import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
+import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/course")
@@ -34,4 +39,11 @@ public class CourseController implements CourseControllerApi {
     public TeachplanNode deleteTeachPlanById(String courseId) {
         return null;
     }
+
+    @Override
+    @GetMapping("/coursebase/list")
+    public QueryResult<CourseInfo> findCourseBase() {
+        return courseService.findCourseBase();
+    }
+
 }

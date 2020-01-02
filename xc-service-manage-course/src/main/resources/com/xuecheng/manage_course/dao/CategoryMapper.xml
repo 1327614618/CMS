@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xuecheng.manage_course.dao.CategoryRepository">
+<mapper namespace="com.xuecheng.manage_course.dao.CategoryMapper">
     <!--    一级分类映射-->
-    <resultMap id="findCategoryList" type="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+    <resultMap id="findCategoryList" type="com.xuecheng.framework.domain.course.ext.CategoryNode">
         <id property="id" column="one_id"/>
          <result property="name" column="one_name"/>
         <!--        二级分类映射-->
-        <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+        <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.CategoryNode">
             <id property="id" column="two_id"/>
             <result property="name" column="two_name"/>
             <!--            三级分类映射-->
-            <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+            <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.CategoryNode">
                 <id property="id" column="three_id"/>
                 <result property="name" column="three_name"/>
             </collection>
@@ -29,6 +29,7 @@
     FROM
 	category a
 	LEFT JOIN category b ON a.id = b.parentid
-	LEFT JOIN category c ON c.parentid = b.id
+	LEFT JOIN category c ON b.id = c.parentid
+	WHERE a.isleaf = "0"and b.isleaf = "0"
     </select>
 </mapper>

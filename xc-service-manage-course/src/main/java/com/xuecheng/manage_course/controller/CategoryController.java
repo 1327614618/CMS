@@ -2,7 +2,6 @@ package com.xuecheng.manage_course.controller;
 
 import com.xuecheng.api.course.CategoryControllerApi;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
-import com.xuecheng.manage_course.dao.CategoryRepository;
 import com.xuecheng.manage_course.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +17,9 @@ public class CategoryController implements CategoryControllerApi {
     @Override
     @GetMapping("/find")
     public CategoryNode findCategoryList() {
-        return categoryService.findCategoryList();
+        CategoryNode categoryList = categoryService.findCategoryList();
+
+        return  categoryList;
+
     }
 }

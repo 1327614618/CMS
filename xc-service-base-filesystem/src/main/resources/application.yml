@@ -18,12 +18,12 @@ spring:
       # 上传文件的临时目录
       location:
       # 最大支持文件大小
-      max-file-size: 1MB
+      max-file-size: 5MB
       # 最大支持请求大小
       max-request-size: 30MB
 xuecheng:
   fastdfs:
-    connect_timeout_in_seconds: 5
-    network_timeout_in_seconds: 30
-    charset: UTF-8
+    connect_timeout_in_seconds: 50000
+    network_timeout_in_seconds: 300000
+    charset: utf-8
     tracker_servers: 192.168.25.153:22122 #多个 trackerServer中间以逗号分隔

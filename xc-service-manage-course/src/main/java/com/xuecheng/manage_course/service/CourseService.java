@@ -3,6 +3,7 @@ package com.xuecheng.manage_course.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
@@ -11,10 +12,7 @@ import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
-import com.xuecheng.manage_course.dao.CourseBaseRepository;
-import com.xuecheng.manage_course.dao.CourseMapper;
-import com.xuecheng.manage_course.dao.TeachPlanRepository;
-import com.xuecheng.manage_course.dao.TeachplanMapper;
+import com.xuecheng.manage_course.dao.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,8 @@ public class CourseService {
     private CourseBaseRepository courseBaseRepository;
     @Autowired
     private CourseMapper courseMapper;
+    @Autowired
+    private CoursePicRepository coursePicRepository;
 
     public TeachplanNode findTeachPlanList(String courseId) {
         TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
@@ -122,5 +122,40 @@ public class CourseService {
         QueryResult<CourseInfo> result = new QueryResult<>();
         result.setList(courseListPage);
         return result;
+    }
+
+    //查询课程图片
+    public ResponseResult saveCoursePic(String courseId, String pic) {
+        //查询课程图片
+        Optional<CoursePic> optional = coursePicRepository.findById(courseId);
+        CoursePic coursePic =null;
+        if (optional.isPresent()) {
+           coursePic = optional.get();
+        }
+           //没有课程图片则新建对象
+        if (coursePic==null){
+          coursePic = new CoursePic();
+        }
+        //是否为空
+        coursePic.setCourseid(courseId);
+         coursePic.setPic(pic);
+
+         coursePicRepository.save(coursePic);
+        return new ResponseResult(CommonCode.SUCCESS);
+
+    }
+    //根据id查询图片
+    public CoursePic findCoursepic(String courseId) {
+        CoursePic coursePic = coursePicRepository.findById(courseId).orElse(null);
+
+        Optional<CoursePic> one = coursePicRepository.findById(courseId);
+        return one.get();
+
+    }
+
+    public ResponseResult deleteCoursePic(String courseId) {
+
+        coursePicRepository.deleteById(courseId);
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 }

@@ -4,6 +4,7 @@ import com.xuecheng.api.filesystem.FileSystemControllerApi;
 import com.xuecheng.filesystem.dao.FileSystemRepository;
 import com.xuecheng.filesystem.service.FileSystemService;
 import com.xuecheng.framework.domain.filesystem.response.UploadFileResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,4 +25,6 @@ public class FileSystemController implements FileSystemControllerApi {
                                    @RequestParam(value = "metedata", required = false) String metadata) {
         return fileSystemService.uploadFileResult(file, filetag,businesskey , metadata);
     }
+
+
 }

@@ -16,6 +16,6 @@ public interface FileSystemControllerApi {
      * @param metadata 元信息,json格式
      * @return
      */
-    @ApiOperation("上传文件")
+    @ApiOperation("图片上传文件")
     public UploadFileResult upload(MultipartFile multipartFile, String filetag, String businesskey, String metadata);
 }

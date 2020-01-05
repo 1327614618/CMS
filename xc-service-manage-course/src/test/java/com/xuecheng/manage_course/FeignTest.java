@@ -1,7 +1,7 @@
-package com.xuecheng.manage_cms;
+package com.xuecheng.manage_course;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
-import com.xuecheng.manage_cms.client.CmsPageClient;
+import com.xuecheng.manage_course.client.CmsPageClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class FeignTest {
     @Autowired
-    CmsPageClient cmsPageClient;
+    private CmsPageClient cmsPageClient;
     @Test
     public void testFeign() {
 //通过服务id调用cms的查询页面接口
-        CmsPage cmsPage = cmsPageClient.findById("5e06bdc5d43fa82ebc360182");
+        CmsPage cmsPage = cmsPageClient.findById("5b3469f794db44269cb2bff1");
         System.out.println(cmsPage);
         while(true){}
     }

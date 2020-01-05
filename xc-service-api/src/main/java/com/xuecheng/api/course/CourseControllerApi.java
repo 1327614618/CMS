@@ -3,7 +3,9 @@ package com.xuecheng.api.course;
 import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
+import com.xuecheng.framework.model.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
@@ -35,5 +37,12 @@ public interface CourseControllerApi {
 
     @ApiOperation("获取课程基础信息")
     public CoursePic findCoursePic(String courseId);
-    
+
+
+    @ApiOperation("课程视图查询")
+    public CourseView courseview(String id);
+
+    @ApiOperation("预览课程")
+    public CoursePublishResult preview(String id);
+
 }

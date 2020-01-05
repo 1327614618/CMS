@@ -5,13 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Administrator
  * @version 1.0
  **/
-@EnableDiscoveryClient//表示这个是客户端
+@EnableFeignClients //开始feignClient
+@EnableDiscoveryClient
 @SpringBootApplication
 @EntityScan("com.xuecheng.framework.domain.course")//扫描实体类
 @ComponentScan(basePackages={"com.xuecheng.api"})//扫描接口

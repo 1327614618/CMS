@@ -10,6 +10,8 @@ import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
@@ -27,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -69,6 +72,8 @@ public class PageService {
     private RestTemplate restTemplate;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+
 
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
         if (queryPageRequest == null) {
@@ -406,5 +411,19 @@ public class PageService {
         cmsPageRepository.save(cmsPage);
 
         return cmsPage;
+    }
+
+    public CmsPageResult save(CmsPage cmsPage) {
+
+        CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getPageType(),cmsPage.getPageWebPath());
+
+        if(cms !=null){
+            //更新
+            return this.update(cms.getPageId(),cmsPage);
+        }else{
+            //添加
+            return this.addPageList(cmsPage);
+        }
+
     }
 }

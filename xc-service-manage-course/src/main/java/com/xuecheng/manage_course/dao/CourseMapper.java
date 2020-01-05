@@ -11,6 +11,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface CourseMapper {
+   /**
+    * 按ID查找课程库
+    * @param id
+    * @return
+    */
    CourseBase findCourseBaseById(String id);
 
    Page<CourseInfo> findCourseListPage(CourseListRequest courseListRequest);

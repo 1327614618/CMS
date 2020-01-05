@@ -7,6 +7,7 @@ import com.xuecheng.framework.domain.cms.CmsSite;
 import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.model.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.*;
@@ -41,5 +42,9 @@ public interface CmsPageControllerApi {
 
     @ApiOperation("发布页面")
     public ResponseResult post(String pageId);
+
+    @ApiOperation("保存页面")
+    public CmsPageResult save(CmsPage cmsPage);
+
 
 }

@@ -73,8 +73,6 @@ public class PageService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-
-
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
         if (queryPageRequest == null) {
             queryPageRequest = new QueryPageRequest();
@@ -414,13 +412,15 @@ public class PageService {
     }
 
     public CmsPageResult save(CmsPage cmsPage) {
-
-        CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getPageType(),cmsPage.getPageWebPath());
-
-        if(cms !=null){
+       // CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
+        //        cmsPage.getPageType(), cmsPage.getPageWebPath());
+        CmsPage cms =
+                cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
+                        cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if (cms != null) {
             //更新
-            return this.update(cms.getPageId(),cmsPage);
-        }else{
+            return this.update(cms.getPageId(), cmsPage);
+        } else {
             //添加
             return this.addPageList(cmsPage);
         }

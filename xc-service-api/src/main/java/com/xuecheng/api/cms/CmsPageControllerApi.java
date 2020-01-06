@@ -1,13 +1,8 @@
 package com.xuecheng.api.cms;
 
-import com.sun.org.apache.regexp.internal.RE;
 import com.xuecheng.framework.domain.cms.CmsPage;
-import com.xuecheng.framework.domain.cms.CmsPageParam;
-import com.xuecheng.framework.domain.cms.CmsSite;
-import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
-import com.xuecheng.framework.model.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.*;

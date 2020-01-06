@@ -10,6 +10,7 @@ import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Api(value="cms课程计划查询接口",description = "课程计划查询")
 public interface CourseControllerApi {
@@ -42,4 +43,6 @@ public interface CourseControllerApi {
     @ApiOperation("预览课程")
     public CoursePublishResult preview(String id);
 
+    @ApiOperation("发布课程")
+    public CoursePublishResult publish(@PathVariable String id);
 }

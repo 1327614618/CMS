@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/** 文件图片上传
+ * @author 13276
+ */
 @RestController
 @RequestMapping("/filesystem")
 public class FileSystemController implements FileSystemControllerApi {

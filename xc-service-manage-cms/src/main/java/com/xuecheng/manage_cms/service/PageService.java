@@ -10,13 +10,11 @@ import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.exception.ExceptionCast;
-import com.xuecheng.framework.model.response.CommonCode;
-import com.xuecheng.framework.model.response.QueryResponseResult;
-import com.xuecheng.framework.model.response.QueryResult;
-import com.xuecheng.framework.model.response.ResponseResult;
+import com.xuecheng.framework.model.response.*;
 import com.xuecheng.manage_cms.config.RabbitmqConfig;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import com.xuecheng.manage_cms.dao.CmsSiteRepository;
@@ -152,7 +150,6 @@ public class PageService {
         if (cmsPage == null) {
             return new CmsPageResult(CmsCode.CMS_COURSE_PERVIEWISNULL, cmsPage);
         }
-
         //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
         CmsPage cmsPageList = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(
                 cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
@@ -160,13 +157,11 @@ public class PageService {
             //页面已存在
             ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
         }
-
         //若不存在
         if (cmsPageList == null) {
             //添加页面主键由spring data 自动生成
             cmsPage.setPageId(null);
             cmsPageRepository.save(cmsPage);
-
             //返回结果
             return new CmsPageResult(CommonCode.SUCCESS, cmsPage);
         }
@@ -377,15 +372,21 @@ public class PageService {
         }
         Map<String, String> msgMap = new HashMap<>();
         msgMap.put("pageId", pageId);
-//消息内容
+        //消息内容
         String msg = JSON.toJSONString(msgMap);
-//获取站点id作为routingKey
+        //获取站点id作为routingKey
         String siteId = cmsPage.getSiteId();
-//发布消息
+        //发布消息
         this.rabbitTemplate.convertAndSend(RabbitmqConfig.EX_ROUTING_CMS_POSTPAGE, siteId, msg);
     }
 
-    //保存静态页面内容
+    /**
+     * 保存静态页面内容
+     *
+     * @param pageId
+     * @param content
+     * @return
+     */
     private CmsPage saveHtml(String pageId, String content) {
 
         //查询页面
@@ -411,12 +412,18 @@ public class PageService {
         return cmsPage;
     }
 
+    /**
+     * 保存课程页面
+     *
+     * @param cmsPage
+     * @return
+     */
     public CmsPageResult save(CmsPage cmsPage) {
-       // CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
+        // CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
         //        cmsPage.getPageType(), cmsPage.getPageWebPath());
-        CmsPage cms =
-                cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
-                        cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
+        CmsPage cms = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(),
+                cmsPage.getSiteId(), cmsPage.getPageWebPath());
         if (cms != null) {
             //更新
             return this.update(cms.getPageId(), cmsPage);
@@ -425,5 +432,51 @@ public class PageService {
             return this.addPageList(cmsPage);
         }
 
+    }
+
+    //一键发布页面
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
+        //添加页面
+        CmsPageResult save = this.save(cmsPage);
+        if (!save.isSuccess()) {
+            return new CmsPostPageResult(CommonCode.FAIL, null);
+        }
+        //要布的页面id
+        CmsPage cmsPage1 = save.getCmsPage();
+
+        //发布页面
+        ResponseResult responseResult = this.postPage(cmsPage1.getPageId());
+        if (!responseResult.isSuccess()){
+            return new CmsPostPageResult(CommonCode.FAIL, null);
+        }
+        //得到页面的url
+        //页面url=站点域名+站点webpath+页面webpath+页面名称
+        //站点id
+        String siteId = cmsPage1.getSiteId();
+        //查询站点信息
+        CmsSite cmsSiteById = findCmsSiteById(siteId);
+        //站点域名
+        String siteDomain = cmsSiteById.getSiteDomain();
+        //站点web路径
+        String siteWebPath = cmsSiteById.getSiteWebPath();
+        //页面web
+        String pageWebPath = cmsPage1.getPageWebPath();
+        //页面名称
+        String pageName = cmsPage1.getPageName();
+        //页面的web访问地址
+        String pageUrl = siteDomain+siteWebPath+pageWebPath+pageName;
+        return new CmsPostPageResult(CommonCode.SUCCESS,pageUrl);
+    }
+    //根据id查询站点信息
+    private CmsSite findCmsSiteById(String cmsSiteId){
+        Optional<CmsSite> op = cmsSiteRepository.findById(cmsSiteId);
+        if (op.isPresent()){
+
+            CmsSite cmsSite = op.get();
+            return   cmsSite;
+        }
+        return null;
+
+        
     }
 }

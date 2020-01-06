@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +46,7 @@ public class CourseService {
     @Autowired
     private CourseMarketRepository courseMarketRepository;
     @Autowired
-    private  CmsPageClient cmsPageClient;
-
+    private CmsPageClient cmsPageClient;
 
     @Value("${course-publish.dataUrlPre}")
     private String publish_dataUrlPre;
@@ -59,7 +60,6 @@ public class CourseService {
     private String publish_templateId;
     @Value("${course-publish.previewUrl}")
     private String previewUrl;
-
 
     public TeachplanNode findTeachPlanList(String courseId) {
         TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
@@ -126,8 +126,11 @@ public class CourseService {
             teachplanRoot.setCourseid(courseId);
             teachplanRoot.setPname(courseBase.getName());
             teachplanRoot.setParentid("0");
-            teachplanRoot.setGrade("1");//1级
-            teachplanRoot.setStatus("0");//未发布
+            //1级
+            teachplanRoot.setGrade("1");
+            //未发布
+            teachplanRoot.setStatus("0");
+
             teachPlanRepository.save(teachplanRoot);
             return teachplanRoot.getId();
 
@@ -151,10 +154,9 @@ public class CourseService {
         return result;
     }
 
-
-
     /**
      * //查询课程图片
+     *
      * @param courseId
      * @param pic
      * @return
@@ -224,16 +226,16 @@ public class CourseService {
         courseView.setTeachplanNode(teachplanNode);
         return courseView;
     }
-    
 
     /**
-     *  根据id查询课程基本信息
+     * 根据id查询课程基本信息
+     *
      * @param courseId
      * @return
      */
     public CourseBase findCurseBaseById(String courseId) {
         Optional<CourseBase> optional = courseBaseRepository.findById(courseId);
-        if (optional.isPresent()){
+        if (optional.isPresent()) {
             CourseBase courseBase = optional.get();
             return courseBase;
         }
@@ -243,10 +245,11 @@ public class CourseService {
 
     /**
      * 课程发布页面预览
+     *
      * @param courseId
      * @return
      */
-    public CoursePublishResult preview(String courseId){
+    public CoursePublishResult preview(String courseId) {
         CourseBase one = this.findCurseBaseById(courseId);
         //发布课程页面预览
         CmsPage cmsPage = new CmsPage();
@@ -255,30 +258,85 @@ public class CourseService {
         //模板
         cmsPage.setTemplateId(publish_templateId);
         //页面别名
-        cmsPage.setPageName(courseId+".html");
+        cmsPage.setPageName(courseId + ".html");
 
         //页面别名
         cmsPage.setPageAliase(one.getName());
         //页面访问路径
-                cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setPageWebPath(publish_page_webpath);
         //页面存储路径
-                cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
         //数据url
-        cmsPage.setDataUrl(publish_dataUrlPre+courseId);
+        cmsPage.setDataUrl(publish_dataUrlPre + courseId);
         //远程请求
         CmsPageResult cmsPageResult = cmsPageClient.save(cmsPage);
-        if (!cmsPageResult.isSuccess()){
-            return new CoursePublishResult(CommonCode.FAIL,null);
+        if (!cmsPageResult.isSuccess()) {
+            return new CoursePublishResult(CommonCode.FAIL, null);
         }
         //页面id
         String pageId = cmsPageResult.getCmsPage().getPageId();
         //页面url
         String pageUrl = previewUrl + pageId;
-        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
+        return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
 
     }
 
+    @Transactional
+    public CoursePublishResult publish(String courseId) {
 
+        CourseBase one = this.findCurseBaseById(courseId);
+        CmsPostPageResult cmsPostPageResult = this.publishPage(courseId);
+        if (!cmsPostPageResult.isSuccess()) {
+            ExceptionCast.cast(CommonCode.FAIL);
+        }
+        //更新课程状态
+        CourseBase courseBase = saveCoursePubState(courseId);
+        //课程索引...
+        //课程缓存...
+        //页面url
+        String pageUrl = cmsPostPageResult.getPageUrl();
+        return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
+        
+    }
+
+    //更新课程发布状态
+    private CourseBase saveCoursePubState(String courseId) {
+        CourseBase courseBase = this.findCurseBaseById(courseId);
+        //更新发布状态
+        courseBase.setStatus("202002");
+        CourseBase save = courseBaseRepository.save(courseBase);
+        return save;
+    }
+
+    /**
+     * 发布课程正式页面
+     *
+     * @param courseId
+     * @return
+     */
+    public CmsPostPageResult publishPage(String courseId) {
+        CourseBase one = this.findCurseBaseById(courseId);
+        //发布课程预览页面
+        CmsPage cmsPage = new CmsPage();
+        //站点
+        //课程预览站点
+        cmsPage.setSiteId(publish_siteId);
+        //模板
+        cmsPage.setTemplateId(publish_templateId);
+        //页面名称
+        cmsPage.setPageName(courseId + ".html");
+        //页面别名
+        cmsPage.setPageAliase(one.getName());
+        //页面访问路径
+        cmsPage.setPageWebPath(publish_page_webpath);
+        //页面存储路径
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        //数据url
+        cmsPage.setDataUrl(publish_dataUrlPre + courseId);
+        //发布页面
+        CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
+        return cmsPostPageResult;
+    }
 
 }
 

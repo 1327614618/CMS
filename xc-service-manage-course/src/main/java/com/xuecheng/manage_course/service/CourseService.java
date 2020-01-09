@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
-import com.xuecheng.framework.domain.course.CourseBase;
-import com.xuecheng.framework.domain.course.CourseMarket;
-import com.xuecheng.framework.domain.course.CoursePic;
-import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.*;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
@@ -45,6 +42,8 @@ public class CourseService {
     private CoursePicRepository coursePicRepository;
     @Autowired
     private CourseMarketRepository courseMarketRepository;
+    @Autowired
+    private CoursePubRepository coursePubRepository;
     @Autowired
     private CmsPageClient cmsPageClient;
 
@@ -296,7 +295,7 @@ public class CourseService {
         //页面url
         String pageUrl = cmsPostPageResult.getPageUrl();
         return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
-        
+
     }
 
     //更新课程发布状态
@@ -338,5 +337,27 @@ public class CourseService {
         return cmsPostPageResult;
     }
 
+    /**
+     * 修改课程发布service
+     *
+     * @param id
+     * @param coursePub
+     * @return
+     */
+    public CoursePub saveCoursePub(String id, CoursePub coursePub) {
+        if (id == null) {
+
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
+        }
+        CoursePub coursePubNew = null;
+        Optional<CoursePub> optional = coursePubRepository.findById(id);
+        if (optional.isPresent()) {
+
+        }
+        if (coursePub == null) {
+            coursePub = new CoursePub();
+        }
+       return coursePub;
+    }
 }
 

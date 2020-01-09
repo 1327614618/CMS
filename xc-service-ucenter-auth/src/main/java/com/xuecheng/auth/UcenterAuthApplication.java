@@ -11,6 +11,9 @@ import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 
+/**
+ * @author 13276
+ */
 @EnableDiscoveryClient
 @EnableFeignClients
 @EntityScan("com.xuecheng.framework.domain.ucenter")//扫描实体类

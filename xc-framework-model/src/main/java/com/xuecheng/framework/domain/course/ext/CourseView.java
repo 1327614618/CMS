@@ -13,8 +13,25 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 public class CourseView implements Serializable {
-    CourseBase courseBase;//基础信息
-    CourseMarket courseMarket;//课程营销
-    CoursePic coursePic;//课程图片
-    TeachplanNode TeachplanNode;//教学计划
+    /**
+     * 基础信息
+     */
+
+    CourseBase courseBase;
+
+    /**
+     * //课程营销
+     */
+    CourseMarket courseMarket;
+
+    /**
+     * 课程图片
+     */
+    CoursePic coursePic;
+    /**
+     * 教学计划
+     */
+
+    TeachplanNode TeachplanNode;
+
 }

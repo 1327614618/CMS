@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.crypto.codec.Base64;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 /**
  * @author 13276
  */
@@ -52,30 +54,33 @@ public class AuthService {
 
     public AuthToken login(String username, String password, String clientId, String clientSecret) {
 //申请令牌
-        AuthToken authToken = applyToken(username,password,clientId, clientSecret);
-        if(authToken == null){
+        AuthToken authToken = applyToken(username, password, clientId, clientSecret);
+        if (authToken == null) {
             ExceptionCast.cast(AuthCode.AUTH_LOGIN_APPLYTOKEN_FAIL);
         } //将 token存储到redis
         String access_token = authToken.getAccess_token();
         String content = JSON.toJSONString(authToken);
         boolean saveTokenResult = saveToken(access_token, content, tokenValiditySeconds);
-        if(!saveTokenResult){
+        if (!saveTokenResult) {
             ExceptionCast.cast(AuthCode.AUTH_LOGIN_TOKEN_SAVEFAIL);
-        } return authToken;
+        }
+        return authToken;
     }
+
     //存储令牌到redis
-    private boolean saveToken(String access_token,String content,long ttl){
+    private boolean saveToken(String access_token, String content, long ttl) {
 //令牌名称
         String name = "user_token:" + access_token;
 //保存到令牌到redis
-        stringRedisTemplate.boundValueOps(name).set(content,ttl, TimeUnit.SECONDS);
+        stringRedisTemplate.boundValueOps(name).set(content, ttl, TimeUnit.SECONDS);
 //获取过期时间
         Long expire = stringRedisTemplate.getExpire(name);
-        return expire>0;
+        return expire > 0;
     }
 
     /**
      * //认证方法
+     *
      * @param username
      * @param password
      * @param clientId
@@ -88,7 +93,6 @@ public class AuthService {
         if (serviceInstance == null) {
             ExceptionCast.cast(AuthCode.AUTH_LOGIN_AUTHSERVER_NOTFOUND);
         }
-
         //获取令牌的url
         String path = serviceInstance.getUri().toString() + "/auth/oauth/token";
         System.out.println(path);
@@ -118,9 +122,16 @@ public class AuthService {
         Map map = null;
         try {
             //http请求spring security的申请令牌接口
-            ResponseEntity<Map> mapResponseEntity = restTemplate.exchange(path, HttpMethod.POST,
-
-                    new HttpEntity<MultiValueMap<String, String>>(formData, header), Map.class);
+            ResponseEntity<Map> mapResponseEntity = restTemplate.exchange(path, HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(formData, header), Map.class);
+            ((RestTemplate) restTemplate).setErrorHandler(new DefaultResponseErrorHandler() {
+                @Override
+                public void handleError(ClientHttpResponse response) throws IOException {
+                    // 设置 当响应400和401时照常响应数据，不要报错
+                    if (response.getRawStatusCode() != 400 && response.getRawStatusCode() != 401) {
+                        super.handleError(response);
+                    }
+                }
+            });
             map = mapResponseEntity.getBody();
         } catch (RestClientException e) {
             e.printStackTrace();
@@ -156,6 +167,28 @@ public class AuthService {
         byte[] encode1 = Base64.encode(string.getBytes());
         System.out.println(encode1);
         return "Basic " + new String(encode1);
+    }
+
+    public AuthToken getUserToken(String token) {
+        String tokenuser = "uset_token:" + token;
+        String redisstoken = stringRedisTemplate.opsForValue().get(tokenuser);
+        if (redisstoken != null) {
+            AuthToken authToken = null;
+            authToken = JSON.parseObject(redisstoken, AuthToken.class);
+            return authToken;
+        }
+        return null;
+    }
+
+    /**
+     * 退出，清除cookie
+     * @param ass_token
+     * @return
+     */
+    public boolean delToken(String ass_token){
+        String s = "token" + ass_token;
+        stringRedisTemplate.delete(s);
+        return true;
     }
 }
         
